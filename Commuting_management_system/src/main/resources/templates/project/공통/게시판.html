@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="project/layout/basic">
+
+<th:block layout:fragment="content">
+
+	<div class="box2">
+	<div class="detail">
+		<h2>게시판</h2>
+	  <div class="search" >
+		<form id="searchForm" th:action="@{/board/web}" th:object="${params}">
+			<select name="searchType" id="select">
+				<option value="" 	 	 th:selected="${#strings.isEmpty( params.searchType)}">전체</option>
+				<option value="idx" 	 th:selected="${#strings.equals( params.searchType, 'idx' )}">게시글번호</option>
+				<option value="nickname" th:selected="${#strings.equals( params.searchType, 'nickname' )}">작성자</option>
+				<option value="title"	 th:selected="${#strings.equals( params.searchType, 'title' )}">제목</option>
+				<option value="content"	 th:selected="${#strings.equals( params.searchType, 'content' )}">내용</option>
+				<!-- 
+				<option value="filename" th:selected="${#strings.equals( params.searchType, 'filename' )}">파일이름</option>
+				 -->
+				<option value="regDate"  th:selected="${#strings.equals( params.searchType, 'regDate2' )}">작성일</option>
+			</select>
+			<input type="text" name="searchKeyword" placeholder="검색어를 입력하세요" th:value="${params.searchKeyword}" />
+			<input type="submit" value="검색"/>
+		  </form>
+		</div>
+		
+	 <table>
+        <thead>
+          <tr>
+            <th class="td-s">번호</th>
+            <th class="td-max">작성자</th>
+            <th>제목</th>
+            <!-- 
+            <th class="td-max">첨부파일</th>
+             -->
+            <th>작성일</th>
+            <th class="td-s">조회수</th>
+            <th class="td-s">댓글수</th>
+          </tr>		
+        </thead>
+		<tbody>
+		   <tr th:if="${not #lists.isEmpty( boardList )}" th:each="row : ${boardList}">
+            <td scope="row" th:text="${row.idx}"></td>
+            <td th:text="${row.nickname}"></td>
+            <td>
+            	<a th:href="|@{/board/web/view}${params.makeQueryString(params.currentPageNo)}&idx=${row.idx}|" th:text="${row.title}"></a>
+            </td>
+           <!-- 
+            <td th:text="${row.filename}"></td>
+             -->
+             <td class="td-m" th:text="${#temporals.format(row.regDate2, 'yyyy-MM-dd HH:mm')}"></td>
+            <td th:text="${row.viewCnt}"></td>
+            <td th:text="${row.comments}"></td>
+          </tr>
+          <tr th:unless="${not #lists.isEmpty( boardList )}">
+            <td colspan="7">조회된 결과가 없습니다.</td>
+          </tr>
+        </tbody>
+	</table>
+	
+	<button class="add" onclick="location.href='/board/web/write'">게시글 작성</button>
+	
+      <th:block layout:fragment="paging">
+        <nav th:replace="project/fragments/common :: pagination">
+        </nav>
+      </th:block>
+      
+	</div>
+	</div>
+	</th:block>
+ 
+  <th:block layout:fragment="script">
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+
+      function movePage(uri, queryString) {
+        location.href = uri + queryString;
+      }	
+      
+    var msg = [[${message}]];
+   	function message(){
+   		if (msg != null){  alert( msg );}
+  	}
+  	message();
+  	
+      /*]]>*/
+    </script>
+  </th:block>
+</html>

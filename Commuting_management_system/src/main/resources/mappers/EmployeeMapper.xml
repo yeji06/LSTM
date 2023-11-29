@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.board.mapper.EmployeeMapper">
+	<insert id="insertDept">
+		insert into DEPT ( dep_no, dep_name, jikup )
+		values ( #{depNo}, #{depName}, #{jikup})
+	</insert>
+	
+	<select id="selectEmployeeList" parameterType="EmployeeDTO" resultType="EmployeeDTO">
+		SELECT  ROW_NUMBER() OVER (ORDER BY  FIELD(jikup, "사장", "부장", "과장", "대리", "사원", " 사원")DESC , dep_name desc) idx,
+		   e.NO no,
+		   name,
+		   jumin_num,
+		   tel_num,
+		   email,
+		   dep_Name,
+		   jikup,
+		   delete_yn
+		FROM
+	      EMPLOYEE e, DEPT d
+	    WHERE e.dep_no = d.dep_no
+	    AND 
+		<include refid="CommonMapper.search_employee_o" />
+		order by  idx desc
+		 <include refid="CommonMapper.paging" />
+  	</select>
+  
+	<sql id="employeeColumns">
+		  no
+		, name
+		, jumin_num
+		, tel_num
+		, email
+		, dep_no
+		, jikup
+		, auth
+	</sql>
+	
+	<insert id="insertEmployee" parameterType="EmployeeDTO">
+		INSERT INTO EMPLOYEE (
+			<include refid="employeeColumns" />
+		) VALUES (
+			  null
+			, #{name}
+			, #{juminNum}
+			, #{telNum}
+			, #{email}
+			, #{depNo}
+			, #{jikup}
+			, #{auth}
+		)
+	</insert>
+	
+	<select id="getEmployeeNo" parameterType="EmployeeDTO" resultType="EmployeeDTO">
+		SELECT
+			no
+		FROM
+			EMPLOYEE
+		WHERE
+			name = #{name}
+		AND
+			jumin_num = #{juminNum}
+	</select>
+	<select id="selectEmployeeNo" parameterType="EmployeeDTO" resultType="EmployeeDTO">
+		SELECT no
+		FROM
+			EMPLOYEE
+		WHERE
+			no = #{no}
+	</select>
+	
+	<select id="getRole" parameterType="Long" resultType="String">
+		SELECT auth
+		FROM
+			EMPLOYEE
+		WHERE
+			no = #{no}
+	</select>
+	
+	<select id="selectEmployeeDetail" parameterType="Long" resultType="EmployeeDTO">
+		SELECT
+			insert_time
+			, no
+			, name
+			, jumin_num
+			, tel_num
+			, email
+			, e.dep_no
+			, dep_name
+			, jikup
+			, auth
+		FROM
+			EMPLOYEE e, DEPT d
+		WHERE e.no = #{no}
+		and e.dep_no = d.dep_no
+	</select>
+	
+	<update id="updateEmployee" parameterType="EmployeeDTO">
+		UPDATE EMPLOYEE
+		SET
+			  name      = #{name}
+			, jumin_num = #{juminNum}
+			, tel_num   = #{telNum}
+			, email     = #{email}
+			, dep_no  = #{depNo}
+			, jikup  = #{jikup}
+			, auth  = #{auth}
+		WHERE
+			no = #{no}
+	</update>
+
+	<update id="deleteEmployee" parameterType="Long">
+		UPDATE EMPLOYEE
+		SET
+			  delete_yn = 'Y'
+			, delete_time = now()
+		WHERE
+			no = #{no}
+	</update>
+	<update id="deleteCancelEmployee" parameterType="Long">
+		UPDATE EMPLOYEE
+		SET
+			  delete_yn = 'N'
+			, delete_time = now()
+		WHERE
+			no = #{no}
+	</update>
+<!-- 
+decode(jikup, '사장',1,'부장',2,'과장',3,'대리',4,'사원',5)
+-->
+	
+	<select id="selectEmployeeTotalCount" parameterType="employeeDTO" resultType="int">
+	    SELECT
+	      COUNT(*)
+	    FROM
+	      EMPLOYEE e, DEPT d
+	    WHERE e.dep_no = d.dep_no
+	    AND 
+    	<include refid="CommonMapper.search_employee_o" />
+  </select>
+
+</mapper>
+  
+	

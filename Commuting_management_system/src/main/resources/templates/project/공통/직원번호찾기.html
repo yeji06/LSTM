@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	>
+	<head>
+	<title>직원번호찾기</title>
+	
+	<style>
+	body { text-align: center;  justify-content: center; }
+	 input[type="text"] {
+    width: 40%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+  input[type="submit"] {
+  margin: 20px;
+    padding: 5px 20px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  input[type="submit"]:hover {  background-color: #0056b3; }
+  
+	</style>
+	
+	</head>
+	<body>
+	<form method="post" th:action="@{/user/getEmpNo}" th:object="${employee}">
+			<input type="text"     th:field="*{name}" 	 placeholder="name" id="name"/>
+			<input type="text"	   th:field="*{juminNum}"   placeholder="jumin-num"/>
+			<input type="submit"   value="employee number" />
+	</form>
+	
+		<input type="text" value="결과: " th:if="${employeeNo}!=null" th:value=${employeeNo.getNo}/>
+	</body>
+<th:block layout:fragment="script">
+ <script th:inline="javascript">
+  /*<![CDATA[*/
+	document.getElementById('name').focus();
+	
+	  /*]]>*/
+	 </script>
+	</th:block>
+
+	</html>

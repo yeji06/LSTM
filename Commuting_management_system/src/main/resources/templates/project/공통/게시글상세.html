@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="project/layout/basic">
+	
+<th:block layout:fragment="content">
+
+  <div class="box2"><div class="detail">
+	  <h2>게시판 상세정보 페이지</h2>
+	  
+  <form  th:object="${board}">
+	  <div class="post-info">
+	  <span>게시글 번호: </span><a th:text="*{idx}"></a>
+	  <table>
+	  	<tr>
+  		<td>작성자</td> <td><a th:text="*{nickname}"></a></td>
+	  	<td>작성일</td> <td><a th:text="*{#temporals.format(regDate2,'yyyy-MM-dd HH:mm')}"></a></td>
+	  	<tr>
+	  	<td>제목</td> <td colspan="5"><a th:text="*{title}"></a></td>
+	  	<tr>
+	  	<td>내용</td> <td colspan="5"><textarea readonly th:text="*{content}"></textarea></td>
+	 	<tr>
+	  	<!-- 
+	  	<td>첨부파일</td> <td colspan="5"><input type="file" th:text="*{filename}"></input></td>
+	   -->
+	  </table>
+	  </div>
+  </form>
+  <div id="board-reg" th:object="${params}">
+	  <a th:href="|@{/board/web}*{makeQueryString(currentPageNo)}|">뒤로 가기</a>
+	  <span th:if="${session.loggedInUser.nickname}==${board.nickname}">
+	  <a>&nbsp/</a>
+	  <a th:href="|@{/board/web/write}*{makeQueryString(currentPageNo)}&idx=${board.idx}|">수정</a>
+	  <a>&nbsp/</a>
+	  <a th:onclick="deleteBoard([[ ${board.idx} ]])">삭제</a>
+	</span>
+	
+  <form name="dataForm" th:action="@{/board/web/delete}" method="post">
+  	<input id="idx" type="hidden" th:field="*{idx}"/>
+  	<input type="hidden" th:field="*{nickname}"/>
+  </form>
+  	</div>
+  	
+	<div class="reply"  th:object="${comment}">
+    <h4 style="margin: 15px 0px 2px ;">Comments</h4>
+	<form action="/board/web/comment/write" method="post"  onsubmit="return comment()">
+		<input id="boardIdx" type="hidden"   th:field="*{boardIdx}"/>
+		<textarea 			 th:field="*{content}"></textarea>
+		<input type="submit"/>
+  	</form>
+  	
+  	<table style="margin-top:5px;">
+	 <tbody>
+		   <tr th:if="${not #lists.isEmpty( comments )}" th:each="row : ${comments}">
+            <td class="td-ss" scope="row" th:hidden="${row.commentId}"></td>
+            <td class="td-ss" th:text="${row.no}"></td>
+            <td th:text="${row.commentNickname}">
+            </td>
+            <td th:text="${row.content}"></td>
+            <td class="td-m" th:text="${#temporals.format(row.commentRegDate2, 'yyyy-MM-dd HH:mm')}"></td>
+            <td class="td-s">
+				<a th:if="${row.commentNickname.equals(session.loggedInUser.nickname)}" th:onclick="deleteComment([[ ${row.commentId} ]], [[ ${row.commentNickname} ]])">삭제</a>
+			</td>
+          </tr>
+          <tr th:unless="${not #lists.isEmpty( comments )}">
+            <td colspan="6">댓글이 아직 없습니다.</td>
+          </tr>
+        </tbody>
+  	</table>
+  	  <form name="dataForm2" th:action="@{/board/web/comment/delete}" method="post">
+  	  <input id="boardIdx2" type="hidden"   th:field="*{boardIdx}"/>
+  	  <input id="commentId" type="hidden" th:field="*{commentId}"/>
+  	  <input id="commentNickname" type="hidden" th:field="*{commentNickname}"/>
+  </form>
+  	</div>
+  	
+    </div>
+    </div>
+  </th:block>
+	
+  <th:block layout:fragment="script">
+    <script th:inline="javascript">
+    /*<![CDATA[*/
+    
+   	  function comment() {
+    	document.getElementById("boardIdx").value = document.getElementById("idx").value;
+     	return true;
+	  }
+   	  function deleteComment(id, nn) {
+		  if (confirm("댓글을 삭제할까요?")) {
+			  document.getElementById("boardIdx2").value = document.getElementById("idx").value;
+			  document.getElementById("commentId").value = id;
+			  document.getElementById("commentNickname").value = nn;
+			  document.dataForm2.submit();
+	     }
+	  }
+   	  function deleteBoard(idx) {
+		  if (confirm(idx + "번 게시글을 삭제할까요?")) {
+			  document.dataForm.submit();
+	     }
+	  }
+      /*]]>*/
+    </script>
+  </th:block>
+  
+</html>

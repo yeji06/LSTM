@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	>
+	<head>
+	<title>닉네임찾기 및 패스워드 변경</title>
+	<link rel="stylesheet" th:href="@{/css/find.css}" />
+	</head>
+	<body>
+	<form method="post" th:action="@{/user/getNickname}" th:object="${params}">
+			<input type="text"     th:field="*{name}" 	 placeholder="name" id="name"/>
+			<input type="text"	   th:field="*{juminNum}"   placeholder="jumin-num"/>
+			<input type="submit"   value="check" />
+	</form>
+	
+	
+	 <div th:if="${params.getNickname}!=null" >
+			<input type="text" id="nickname" th:value="${params.getNickname}"/>
+
+		<form method="post" th:action="@{/user/setPw}" th:object="${params}" onsubmit="return validateForm()">
+			 변경할 패스워드: 
+			<input type="hidden"   th:field="*{nickname}"/>
+		 	<input type="password" th:field="*{pw}"  placeholder="new password" required/>
+			<input type="password" name="pw2" placeholder="confirm password" required/>
+			 <input type="submit"/>
+	 	</form> 
+	</div>
+	</body>
+	
+	<th:block layout:fragment="script">
+ 	<script th:inline="javascript">
+  	/*<![CDATA[*/
+		document.getElementById('name').focus();
+		
+		 function validateForm() {
+			    var pw  = document.querySelector('input[name="pw"]').value;
+			    var pw2 = document.querySelector('input[name="pw2"]').value;
+			    
+			    if (pw !== pw2) {
+			        alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+			        return false;
+			    }
+			    return true; // 폼이 제대로 작동할 경우 true를 반환하여 제출을 허용
+			  }
+		 
+		 var err = [[${errorMessage}]];
+		    var success = [[${successMessage}]];
+		  	function message(){
+		  		if (err != null){alert( err );}
+		  		if (success != null){
+		  		  alert( success );
+		  		  window.open("about:blank","_self").close();
+		  		}
+			}
+			message();
+  	
+	  /*]]>*/
+	 </script>
+	</th:block>
+
+	</html>

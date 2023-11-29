@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="project/layout/basic">
+
+  <th:block layout:fragment="content">
+
+	<div class="box2">
+		<div class="detail"><h2>인사관리</h2>
+		
+		<button class="add" onclick="popup()">직원추가</button>
+	  
+	  <div class="search" >
+		<form id="searchForm" th:action="@{/admin/HRM}" th:object="${params}">
+			<label>
+			<input id="deleteYn"  name="deleteYn" type="checkbox" th:checked="${params.deleteYn != null ? true:false}">
+			삭제된 직원조회</label>
+			<select name="searchType" id="select">
+				<option value="" 	 	 th:selected="${#strings.isEmpty( params.searchType)}">전체</option>
+				<option value="no" 	 	 th:selected="${#strings.equals( params.searchType, 'no' )}">직원번호</option>
+				<option value="name" 	 th:selected="${#strings.equals( params.searchType, 'name' )}">이름</option>
+				<option value="depName"	 th:selected="${#strings.equals( params.searchType, 'depName' )}">부서</option>
+				<option value="jikup"	 th:selected="${#strings.equals( params.searchType, 'jikup' )}">직급</option>
+			</select>
+			<input type="text" name="searchKeyword" placeholder="검색어를 입력하세요" th:value="${params.searchKeyword}" />
+			<input type="submit" value="검색"/>
+		  </form>
+		</div>
+		
+		<table class="emp">
+	        <thead>
+	          <tr>
+	            <th>idx</th>
+	            <th>직원번호</th>
+	            <th>이름</th>
+	            <th>주민번호</th>
+	            <th>전화번호</th>
+	            <th>이메일</th>
+	            <th>부서</th>
+	            <th>직급</th>
+	            <th>-</th>
+	          </tr>
+	        </thead>
+			<tbody>
+			   <tr th:if="${not #lists.isEmpty( employeeList )}" th:each="row : ${employeeList}">
+	            <td scope="row" th:text="${row.idx}"></td>
+	            <td th:text="${row.no}"></td>
+	            <td th:text="${row.name}"></td>
+	            <td th:text="${row.juminNum}"></td>
+	            <td th:text="${row.telNum}"></td>
+	            <td th:text="${row.email}"></td>
+	            <td th:text="${row.depName}"></td>
+	            <td th:text="${row.jikup}"></td>
+	            <td th:if="${row.deleteYn.toString().equals('N') ? true:false}">
+	              <a th:onclick="updateEmployee([[${row.no}]])">수정</a> |
+	              <a th:onclick="deleteEmployee([[ ${row.no} ]])">삭제</a>
+	            </td>
+	            <td th:unless="${row.deleteYn.toString().equals('N') ? true:false}">
+	              <a th:onclick="deleteCancelEmployee([[ ${row.no} ]])">복구</a>
+	            </td>
+	          </tr>
+	          <tr th:unless="${not #lists.isEmpty( employeeList )}">
+	            <td colspan="9">조회된 결과가 없습니다.</td>
+	          </tr>
+	        </tbody>
+		</table>
+		<form name="dataForm4" th:action="@{/admin/employee/cancel}" method="post" th:object="${params}">
+	  	  <input id="empNo4" type="hidden"  th:field="*{no}" />
+	    </form>
+		<form name="dataForm3" th:action="@{/admin/employee/delete}" method="post" th:object="${params}">
+	  	  <input id="empNo3" type="hidden"  th:field="*{no}" />
+	    </form>
+	    
+		 <th:block layout:fragment="paging">
+			<nav th:replace="project/fragments/common :: pagination"></nav>
+		</th:block>
+
+</div></div>
+</th:block>
+	
+  <th:block layout:fragment="script">
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+    	  	  
+   	  function deleteCancelEmployee(empNo) {
+		  document.getElementById("empNo4").value = empNo;
+		  document.dataForm4.submit();
+   	  }
+    	  	  
+   	  function deleteEmployee(empNo) {
+		  if (confirm(empNo + "번 직원을 삭제할까요?")) {
+		  document.getElementById("empNo3").value = empNo;
+		  document.dataForm3.submit();}
+   	  }
+    	  
+   	  function updateEmployee(empNo) {
+   	    var url = "/admin/employee/add?no=" + empNo;
+   	    var name = "정보수정"
+   	    var option = "width=900,height=300,location=no"
+   	    
+   	    window.open(url, name, option);
+   	  }
+    
+      function popup() { // 직원추가
+    	var url = "/admin/employee/add"
+    	var name = "직원추가"
+    	var option="width=900,height=300,location=no"
+    	  
+        window.open(url,name,option);
+      }
+      
+      function movePage(uri, queryString) {
+          location.href = uri + queryString;
+        }	
+        
+      /*]]>*/
+    </script>
+  </th:block>
+  
+</html>

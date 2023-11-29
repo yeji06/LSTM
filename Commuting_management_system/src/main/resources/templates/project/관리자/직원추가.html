@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+ <html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	>
+<head>
+ <link rel="stylesheet" th:href="@{/css/add.css}" />
+</head>
+
+	<body>
+	<div class="container">
+	<h2 th:if="*{employee.no != null}" style="color:red">직원 수정 페이지</h2>
+		<h2 th:unless="*{employee.no != null}">직원 추가 페이지</h2>
+		
+	<div class="form-group">
+    <form id="employeeForm" th:action="@{/admin/employee/register}" th:object="${employee}" method="post" onsubmit="return checkRole(this)">    
+    	   <!--/* update의 경우 서버로 전달할 번호 (PK) */-->
+		<input type="hidden" th:if="*{no != null and no > 0}" th:field="*{no}" />
+	      
+    	<input type="text" id="name" 	 th:value="${employee.name}" 	 th:field="*{name}" placeholder="이름" 
+    						required/>
+        <input type="text" id="juminNum" th:value="${employee.juminNum}" th:field="*{juminNum}" placeholder="주민번호" 
+       				   		pattern="[0-9]{13}" required/>
+        <input type="tel"  id="telNum" 	 th:value="${employee.telNum}" 	 th:field="*{telNum}" placeholder="전화번호" 
+        					pattern="(010|016|011)+[0-9]{7,8}" required/>
+        <input type="email" id="email" 	th:value="${employee.email}" 	 th:field="*{email}" placeholder="이메일" 
+        					pattern="[a-zA-Z0-9]*[@][a-zA-Z0-9]*\.[a-zA-Z]*" required/>
+        
+        <select id="depNo" name="부서" th:value="${employee.depNo}" th:field="*{depNo}" >
+        	<option value="">부서선택</option>
+            <option value="1">부서1</option>
+            <option value="2">부서2</option>
+            <option value="3">부서3</option>
+            <option value="99">부서4</option></select>
+            
+        <select id="jikup" name="직급" th:value="${employee.jikup}" th:field="*{jikup}">
+	        <option value="">직급선택</option>
+	        <option value="사장"> 사장</option>
+	        <option value="부장"> 부장</option>
+	        <option value="과장"> 과장</option>
+	        <option value="대리"> 대리</option>
+	        <option value="사원"> 사원</option></select>
+     
+     <br>  
+     <input type="checkbox" id="auth" name="auth" th:checked="${employee.auth != null ? true:false}" />
+	 <label for="auth">관리자</label>
+				
+	 <input type="submit"  value="수정"></input>
+
+    </form>
+    </div>
+    </div>
+  
+ </body>
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+   	 function checkRole(form){
+    	  if(form.auth.checked){form.auth.value = "ROLE_ADMIN";}
+    	  else if(form.auth.value==null){form.auth.value = "ROLE_USER";}
+   		 
+   		 if(confirm('수정하시겠습니까?'))
+   		 {return true;}
+    	return false;
+      } 
+    	  
+    var err = [[${errorMessage}]];
+    var success = [[${successMessage}]];
+  	function message(){
+  		if (err != null){alert( err );}
+  		if (success != null){
+  		  alert( success );
+  		  window.open("about:blank","_self").close();
+  		}
+	}
+	message();
+    	  
+   /*]]>*/
+</script>
+</html>

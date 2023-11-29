@@ -1,0 +1,142 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CommonMapper">
+    <!-- MySQL Paging -->
+  <sql id="paging">
+    LIMIT
+      #{paginationInfo.firstRecordIndex}, #{recordsPerPage}
+  </sql>
+
+  <!-- Oracle Paging Header -->
+  <sql id="pagingHeader"> 
+    <if test="paginationInfo.firstRecordIndex != null and paginationInfo.lastRecordIndex != null">
+      SELECT *
+      FROM (
+        SELECT rownum rnum, m.*
+        FROM (
+    </if>
+  </sql>
+  
+  <!-- Oracle Paging Footer -->
+  <sql id="pagingFooter">
+    <if test="paginationInfo.firstRecordIndex != null and paginationInfo.lastRecordIndex != null">
+        ) m
+        WHERE rownum <![CDATA[<=]]> #{paginationInfo.lastRecordIndex}
+      )
+      WHERE rnum <![CDATA[>]]> #{paginationInfo.firstRecordIndex}
+    </if>
+  </sql>
+  
+  <sql id="search_o">
+    <!-- 검색 키워드가 있을 때 -->
+    <if test="searchKeyword != null and searchKeyword != ''">
+      <choose>
+        <!-- 검색 유형이 있을 때 -->
+        <when test="searchType != null and searchType != ''">
+          <choose>
+            <when test="'no'.equals(searchType)">
+              AND w.no LIKE CONCAT('%', #{searchKeyword}, '%')
+            </when>
+            <when test="'name'.equals(searchType)">
+              AND e.name LIKE CONCAT('%', #{searchKeyword}, '%')
+            </when>
+            <when test="'work'.equals(searchType)">
+              AND w.work_on LIKE CONCAT('%', #{searchKeyword}, '%')
+            </when>
+          </choose>
+        </when>
+        <!-- 검색 유형이 없을 때 -->
+        <otherwise>
+          AND
+            (
+                 w.no LIKE CONCAT('%', #{searchKeyword}, '%')
+              OR e.name LIKE CONCAT('%', #{searchKeyword}, '%')
+              OR w.work_on LIKE CONCAT('%', #{searchKeyword}, '%')
+            )
+        </otherwise>
+      </choose>
+    </if>
+  </sql>
+  
+  <sql id="search_board_o">
+    <!-- 검색 키워드가 있을 때 -->
+    <if test="searchKeyword != null and searchKeyword != ''">
+      <choose>
+        <!-- 검색 유형이 있을 때 -->
+        <when test="searchType != null and searchType != ''">
+          <choose>
+            <when test="'idx'.equals(searchType)">
+             AND idx LIKE CONCAT('%', #{searchKeyword}, '%')
+            </when>
+            <when test="'nickname'.equals(searchType)">
+             AND nickname LIKE CONCAT('%', #{searchKeyword}, '%')
+            </when>
+            <when test="'title'.equals(searchType)">
+             AND title LIKE CONCAT('%', #{searchKeyword}, '%')
+            </when>
+            <when test="'content'.equals(searchType)">
+             AND content LIKE CONCAT('%', #{searchKeyword}, '%')
+            </when>
+            <when test="'regDate'.equals(searchType)">
+             AND reg_date LIKE CONCAT('%', #{searchKeyword}, '%')
+            </when>
+            <when test="'filename'.equals(searchType)">
+             AND filename LIKE CONCAT('%', #{searchKeyword}, '%')
+            </when>
+          </choose>
+        </when>
+        <!-- 검색 유형이 없을 때 -->
+        <otherwise>
+             AND
+              (  idx LIKE CONCAT('%', #{searchKeyword}, '%')
+              OR nickname LIKE CONCAT('%', #{searchKeyword}, '%')
+              OR title LIKE CONCAT('%', #{searchKeyword}, '%')
+              OR content LIKE CONCAT('%', #{searchKeyword}, '%')
+              OR reg_date LIKE CONCAT('%', #{searchKeyword}, '%')
+              OR filename LIKE CONCAT('%', #{searchKeyword}, '%') )  
+        </otherwise>
+      </choose>
+    </if>
+  </sql>
+  
+   <sql id="search_employee_o">
+     <choose>
+	   <when test="deleteYn == null"> e.delete_yn="N" </when>
+	   <otherwise> e.delete_yn="Y" </otherwise>
+     </choose>
+     
+    <!-- 검색 키워드가 있을 때 -->
+    <if test="searchKeyword != null and searchKeyword != ''">
+      <choose>
+        <!-- 검색 유형이 있을 때 -->
+        <when test="searchType != null and searchType != ''">
+          <choose>
+            <when test="'no'.equals(searchType)">
+              AND e.no LIKE CONCAT('%', #{searchKeyword}, '%')
+            </when>
+            <when test="'name'.equals(searchType)">
+              AND e.name LIKE CONCAT('%', #{searchKeyword}, '%')
+            </when>
+            <when test="'depName'.equals(searchType)">
+              AND d.dep_name LIKE CONCAT('%', #{searchKeyword}, '%')
+            </when>
+            <when test="'jikup'.equals(searchType)">
+              AND e.jikup LIKE CONCAT('%', #{searchKeyword}, '%')
+            </when>
+          </choose>
+        </when>
+        <!-- 검색 유형이 없을 때 -->
+        <otherwise>
+          AND
+            (
+                 e.no 	 LIKE CONCAT('%', #{searchKeyword}, '%')
+              OR e.name	 LIKE CONCAT('%', #{searchKeyword}, '%')
+              OR d.dep_name LIKE CONCAT('%', #{searchKeyword}, '%')
+              OR e.jikup 	 LIKE CONCAT('%', #{searchKeyword}, '%')
+            )
+        </otherwise>
+      </choose>
+    </if>
+  </sql>
+
+
+</mapper>

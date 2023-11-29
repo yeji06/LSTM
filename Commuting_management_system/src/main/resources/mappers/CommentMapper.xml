@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.board.mapper.CommentMapper">
+
+  <sql id="commentColumns">
+      comment_id
+    , board_idx
+    , comment_nickname
+    , content
+    , comment_regdate
+    , comment_update
+    , delete_yn
+  </sql>
+  <insert id="insertComment" parameterType="AndroidCommentDTO">
+    INSERT INTO COMMENTS (
+      <include refid="commentColumns" />
+    ) VALUES (
+        null
+      , #{boardIdx}
+      , #{commentNickname}
+      , #{content}
+      , now()
+      , NULL
+      , 'N'
+    )
+  </insert>
+  <update id="updateComment" parameterType="AndroidCommentDTO">
+    UPDATE COMMENTS
+    SET
+        comment_update = now()
+      , content = #{content}
+    WHERE
+      comment_id = #{commentId}
+  </update>
+ 
+  <update id="AndroidDeleteComment" parameterType="AndroidCommentDTO">
+       UPDATE COMMENTS
+    SET
+        delete_yn = 'Y', 
+        comment_update = now()
+    WHERE
+        board_idx = #{boardIdx}  
+        AND comment_nickname = #{commentNickname}  
+        AND comment_id = #{commentId}
+</update>
+  
+  
+  <select id="selectCommentList" parameterType="long" resultType="AndroidCommentDTO">
+    SELECT ROW_NUMBER() OVER (ORDER BY comment_id asc) no,
+      <include refid="commentColumns" />
+    FROM
+      COMMENTS
+    WHERE
+      delete_yn = 'N'
+    AND
+      board_idx = #{idx}
+    ORDER BY
+      comment_id desc,
+      comment_regdate desc
+  </select>
+  
+  
+	<!-- 웹 -->
+  <select id="selectCommentDetail" parameterType="long" resultType="CommentDTO">
+    SELECT
+      <include refid="commentColumns" />
+    FROM
+      COMMENTS
+    WHERE
+      delete_yn = 'N'
+    AND
+      comment_id = #{commentId}
+      </select>
+   
+  <update id="deleteComment" parameterType="long">
+    UPDATE COMMENTS
+    SET
+        delete_yn = 'Y', 
+        comment_update = now()
+    WHERE
+      comment_id = #{commentId}
+  	</update>
+  <select id="selectCommentDetail2" parameterType="long" resultType="CommentDTO">
+    SELECT
+       comment_id
+    , board_idx
+    , comment_nickname
+    , content
+    , comment_regdate comment_regdate2
+    , comment_update comment_update2
+    , delete_yn
+    FROM
+      COMMENTS
+    WHERE
+      delete_yn = 'N'
+    AND
+      comment_id = #{commentId}
+  </select>
+  <select id="selectCommentList2" parameterType="long" resultType="CommentDTO">
+    SELECT ROW_NUMBER() OVER (ORDER BY comment_id asc) no,
+      comment_id
+    , board_idx
+    , comment_nickname
+    , content
+    , comment_regdate comment_regdate2
+    , comment_update comment_update2
+    , delete_yn
+    FROM
+      COMMENTS
+    WHERE
+      delete_yn = 'N'
+    AND
+      board_idx = #{idx}
+    ORDER BY
+      comment_id desc,
+      comment_regdate desc
+  </select>
+  <select id="selectCommentTotalCount" parameterType="long" resultType="int">
+    SELECT
+      COUNT(*)
+    FROM
+      COMMENTS
+    WHERE
+      delete_yn = 'N'
+    AND
+      board_idx = #{postdIdx}
+  </select>
+
+</mapper>

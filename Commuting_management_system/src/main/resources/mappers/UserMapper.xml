@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.board.mapper.UserMapper">
+
+	<insert id="insertUser" parameterType="com.board.domain.UserDTO">
+		INSERT INTO USERACCOUNT (nickname, pw, employee_no)
+		SELECT #{nickname}, #{pw}, e.no
+		FROM EMPLOYEE e
+		WHERE e.no = #{employeeNo}
+		AND NOT EXISTS (
+		SELECT 1
+		FROM USERACCOUNT
+		WHERE nickname = #{nickname}
+		)
+		AND NOT EXISTS (
+		SELECT 1
+		FROM USERACCOUNT
+		WHERE employee_no = #{employeeNo}
+		);
+	</insert>
+
+	<select id="login" parameterType="com.board.domain.UserDTO"
+		resultType="com.board.domain.UserDTO">
+		SELECT nickname, pw, employee_no
+		FROM USERACCOUNT
+		WHERE nickname = #{nickname}
+	</select>
+
+	<!-- 사용자 정보 가져오기를 위한 SQL 쿼리 -->
+	<select id="getUserInfo"
+		parameterType="com.board.domain.UserDTO"
+		resultType="com.board.domain.UserDTO">
+		SELECT nickname,employee_no
+		FROM USERACCOUNT
+		WHERE nickname = #{userNickname}
+	</select>
+
+	<!-- 닉네임 중복 체크를 위한 SQL 쿼리 -->
+	<select id="checkNickname"
+		parameterType="com.board.domain.UserDTO"
+		resultType="com.board.domain.UserDTO">
+		SELECT nickname FROM USERACCOUNT WHERE nickname = #{nickname}
+	</select>
+	
+	<select id="checkNameJumin" parameterType="com.board.domain.AndroidEmployeeDTO" resultType="com.board.domain.AndroidEmployeeDTO">
+	SELECT *
+	FROM EMPLOYEE
+	WHERE name = #{name} And jumin_Num=#{juminNum}
+	
+	</select>
+	
+	<select id="getUserIdByEmployeeNo" parameterType="com.board.domain.UserDTO" resultType="com.board.domain.UserDTO">
+    SELECT nickname
+    FROM USERACCOUNT
+    WHERE employee_no = #{employeeNo}
+</select>
+
+
+	<update id="updatePassword" parameterType="com.board.domain.UserDTO">
+        UPDATE USERACCOUNT
+        SET pw = #{pw}
+        WHERE nickname = #{nickname}
+    </update>
+		
+<!--  ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ -->		 
+    <sql id="UserColumns">
+        employee_no,
+        nickname,
+        pw
+    </sql>
+ <!--   
+    <insert id="insertUser" parameterType="UserDTO">
+        INSERT INTO USERACCOUNT (
+            <include refid="UserColumns" />
+        ) VALUES (
+            #{employeeNo},
+            #{nickname},
+            #{pw}
+        )
+    </insert>
+-->		
+<!-- 닉네임찾기 및 패스워드 변경 -->
+ <select id="getNickname" parameterType="EmployeeDTO" resultType="String">
+        SELECT nickname
+        FROM USERACCOUNT
+        WHERE employee_no = (select no 
+        					 from EMPLOYEE 
+        					 where name=#{name} 
+      						 and jumin_num=#{juminNum})
+    </select>
+    <update id="setPw" parameterType="UserDTO">
+    	UPDATE USERACCOUNT
+    	set pw = #{pw}
+    	where
+    		nickname = #{nickname}
+    </update>
+<!-- 로그인 -->
+ <select id="selectUser" parameterType="UserDTO" resultType="UserDTO">
+        SELECT
+        <include refid="UserColumns" />
+        FROM USERACCOUNT
+        WHERE nickname = #{nickname}
+    </select>
+    
+<!-- 회원가입 -->
+<!-- 중복확인 -->
+<select id="selectEmployeeNo2" parameterType="UserDTO" resultType="int">
+	SELECT  count(employee_no)
+	FROM	USERACCOUNT 
+	where	EMPLOYEE_NO = #{employeeNo}
+</select>
+<select id="selectEmpNo3" parameterType="String" resultType="int">
+	SELECT  employee_no
+	FROM	USERACCOUNT 
+	where	nickname = #{nickname}
+</select>
+ <select id="selectNickname" parameterType="UserDTO" resultType="UserDTO">
+		SELECT nickname
+		FROM USERACCOUNT
+		WHERE nickname = #{nickname}
+    </select>
+    
+ <select id="myInfo" parameterType="UserDTO" resultType="UserDTO">
+		SELECT e.NO NO, nickname, name, JUMIN_NUM, TEL_NUM, email, DEP_NAME, JIKUP
+		FROM EMPLOYEE e, USERACCOUNT u, DEPT d 
+		WHERE e.NO = u.EMPLOYEE_NO
+		AND e.DEP_NO = d.DEP_NO 
+		AND u.NICKNAME LIKE #{nickname}
+    </select>
+	
+ <select id="test" parameterType="UserDTO" resultType="UserDTO">
+		SELECT nickname
+		FROM USERACCOUNT
+		WHERE EMPLOYEE_NO = 1
+    </select>
+    
+
+	
+
+
+</mapper>

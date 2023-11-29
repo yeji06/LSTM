@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="project/layout/basic">
+<th:block layout:fragment="content">
+
+	<div class="box2">
+	<div class="box2-inbox">
+		<h2>Sign up</h2>
+		<div class="signUp">
+		<form method="post" th:action="@{/user/signUp}" th:object="${user}" onsubmit="return validateForm()";>
+			<input id="empNo" 	type="text"  th:field="*{employeeNo}" placeholder="employee number" required/>
+			<input type="text"	   th:field="*{nickname}"   placeholder="new nickname" required/>
+			<input type="password" th:field="*{pw}"  		placeholder="new password" required/>
+			<input type="password" th:field="*{pw2}" 		placeholder="confirm password" required/>
+			<input type="submit" value="Sign up" />
+		</form>
+		</div>
+		<div style="text-align:left;">
+		<a style="color:red; font-size:10px; font-family:arial;" onclick="empNo()">직원번호 찾기</a>
+		</div>
+	</div><!-- box2_inbox -->
+	</div><!-- box2 -->
+</th:block>
+<th:block layout:fragment="script">
+ <script th:inline="javascript">
+  /*<![CDATA[*/
+	document.getElementById('empNo').focus();
+    function empNo(){ //직원번호찾기
+    	var url = "/user/empNo"
+        	var name = "직원번호찾기"
+        	var option="width=300,height=300,location=no"
+        	  
+            window.open(url,name,option);
+    }
+	  
+     function validateForm() {
+    var pw  = document.querySelector('input[name="pw"]').value;
+    var pw2 = document.querySelector('input[name="pw2"]').value;
+    
+    if (pw !== pw2) {
+        alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+        return false;
+    }
+    return true; // 폼이 제대로 작동할 경우 true를 반환하여 제출을 허용
+  }
+     
+     var err = [[${errorMessage}]];
+     var success = [[${successMessage}]];
+  	function message(){
+  		if (err != null)
+ 		 alert( err );
+  		if (signup != null)
+	     alert( success );
+	}
+	message();
+	
+  /*]]>*/
+ </script>
+</th:block>
+
+</html>

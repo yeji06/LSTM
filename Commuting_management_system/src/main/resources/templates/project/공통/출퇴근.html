@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="project/layout/basic">
+
+  <th:block layout:fragment="content">
+
+	  <div class="box2">
+			<div class="detail">
+			<div th:if="${session.ADMIN} == ADMIN">
+			<h2>근태관리</h2>
+			</div>
+			<div th:unless="${session.ADMIN} == ADMIN">
+			<h2>근무현황조회</h2>
+			</div>
+
+	   <div class="search" >
+		<form id="searchForm" th:action="@{/ES}">
+			<select name="searchType" id="select">
+				<option value="" th:selected="${#strings.isEmpty( params.searchType )}">전체</option>
+				<option value="no" th:selected="${#strings.equals( params.searchType, 'no' )}">직원번호</option>
+				<option value="name" th:selected="${#strings.equals( params.searchType, 'name' )}">이름</option>
+				<option value="work" th:selected="${#strings.equals( params.searchType, 'work' )}">근무일</option>
+			</select>
+			<input type="text" name="searchKeyword" placeholder="검색어를 입력하세요" th:value="${params.searchKeyword}" />
+			<input type="submit" value="검색"/>
+		  </form>
+		</div>
+  	
+  	  <table>
+        <thead>
+          <tr>
+            <th>idx</th>
+            <th>직원번호</th>
+            <th>이름</th>
+            <th>출근년월일</th>
+            <th>출근시간</th>
+            <th>퇴근시간</th>
+            <th>근무시간</th>
+            <th>기타</th>
+          </tr>
+        </thead>
+		<tbody>
+		   <tr th:if="${not #lists.isEmpty( workList )}" th:each="row : ${workList}">
+            <td scope="row" th:text="${row.num}"></td>
+            <td th:text="${row.no}"></td>
+            <td th:text="${row.name}"></td>
+            <td th:text="${#temporals.format(row.workDate, 'yyyy-MM-dd')}"></td>
+            <td th:text="${#temporals.format(row.workOn, 'HH:mm:ss')}"></td>
+            <td th:text="${#temporals.format(row.workOff, 'HH:mm:ss')}"></td>
+            <td th:text="${row.workTime}"></td>
+            <td></td>
+          </tr>
+          <tr th:unless="${not #lists.isEmpty( workList )}">
+            <td colspan="8">조회된 결과가 없습니다.</td>
+          </tr>
+        </tbody>
+	  </table>
+	  <form method="post" th:action="@{/ES/add}" th:object="${params}">
+		<input type="text" id="name" th:field="*{name}" placeholder="이름"/>
+		<input type="text" id="jumin" th:field="*{jumin}" placeholder="주민등록번호"/>
+		<input type="submit">
+	  </form>
+    <th:block layout:fragment="paging">
+     <nav th:replace="project/fragments/common :: pagination">
+      </nav>
+    </th:block>	 
+	 
+  </div></div>
+  </th:block>
+
+	
+  <th:block layout:fragment="script">
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+
+      function movePage(uri, queryString) {
+        location.href = uri + queryString;
+      }	
+      
+      /*]]>*/
+    </script>
+  </th:block>
+
+</html>

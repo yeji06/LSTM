@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<body th:fragment="main-body">
+<div id="header">
+  <div id="main" onclick="toggleDisable()">
+	Menu<div class="box">
+	</div>
+	<div id="info">
+		<div th:if="${session.loggedInUser} == null">
+		</div>
+		<div th:unless="${session.loggedInUser} == null">
+			<div th:text="${session.loggedInUser.nickname}+' '+님"></div>
+		 <input type="text" id="timer" style="position:absolute; left:20px; background:none; border: 0px; width:33px;" value="">
+		</div>
+	</div>
+   </div>	
+	<div th:if="${session.loggedInUser} == null">
+        <button onclick="signUp()" class="user-button">Sign up</button>
+		<button onclick="login()" class="user-button" style="right:120px;">Login</button>
+    </div>
+    <div th:unless="${session.loggedInUser} == null">
+        <button onclick="logout()" class="user-button">Logout</button>
+   </div>
+</div>
+
+<div id="container">
+ <div class="rule-toggle">
+  <div id="navigation">
+	<div th:if="${session.loggedInUser} == null">
+		<ul>
+			<li><a th:href="|@{/main}|">홈</a></li>
+		</ul>
+	</div>
+	
+	 <div th:unless="${session.loggedInUser} == null" >
+		<div th:if="${session.ADMIN} == ADMIN">
+	      <ul>
+	        <li><a th:href="|@{/main}|">홈</a></li>
+			<li><a th:href="|@{/myInfo}|">내정보</a></li>
+			<li><a th:href="|@{/admin/HRM}|">인사관리</a></li>
+			<li><a th:href="|@{/ES}|">근태관리</a></li>
+			</ul>	
+		  <div id="mode"><h2 style="color:blue">관리자</h2><a th:href="|@{/admin/out}|">사용자 모드로 전환</a></div>
+		</div>
+		<div th:unless="${session.ADMIN} == ADMIN">
+		  <ul>
+			<li><a th:href="|@{/main}|">홈</a></li>
+			<li><a th:href="|@{/myInfo}|">내정보</a></li>
+			<li><a th:href="|@{/board/web}|">게시판</a></li>
+			<li><a th:href="|@{/ES}|">근무현황조회</a></li>
+		 	</ul>
+		    <div id="mode" >
+		 		<h2>일반</h2>
+		  		  <a th:href="|@{/admin/on}|">관리자 모드로 전환</a>
+		  	</div>	
+		</div>
+	 </div>
+ 
+  </div>
+ </div>
+  <th:block layout:fragment="modal"></th:block>
+
+	<th:block layout:fragment="content"></th:block>
+		 <th:block layout:fragment="paging"></th:block>
+			 <th:block layout:fragment="add-content"></th:block>	
+		
+</div>
+
+	<footer id="footer">
+	&nbsp;&nbsp;2023 모블교육센터 프로젝트_출퇴근관리시스템
+	</footer>
+	
+	
+	<script th:src="@{/script/main.js}"></script>
+	<th:block layout:fragment="script"></th:block>
+
+</body>

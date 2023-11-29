@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="project/layout/basic">
+
+<th:block layout:fragment="content">
+
+<div class="box2"><div class="detail">
+		<h2 th:if="*{board.idx != null}">게시글 수정</h2>
+		<h2 th:unless="*{board.idx != null}">게시글 작성</h2>
+		
+  <div class="post-info">
+   <form method="post" th:action="@{/board/web/register}" 
+   		 th:object="${board}" onsubmit="return confirmModal(this)">
+	 	 <!--/* update의 경우 서버로 전달할 게시글 번호 (PK) */-->
+		<input type="hidden" th:if="*{idx != null and idx > 0}" th:field="*{idx}" />
+	  
+	  <table>
+	  	<tr>
+	  		<td><label>제목</label></td> <td colspan="5"><input type="text" id="title"  th:field="*{title}" placeholder="제목"/></td>
+	  	<tr>
+	  	<td>내용</td> <td colspan="5"><textarea id="content"  th:field="*{content}"  placeholder="내용"></textarea></td>
+	 	<tr>
+	  </table>
+	<input type="submit" value="작성">
+  </form>
+  </div>
+   <a th:if="*{board.idx != null}" th:href="|@{/board/web/view}${params.makeQueryString(params.currentPageNo)}&idx=${board.idx}|">취소</a>
+  </div> </div>
+  
+</th:block>
+
+	
+  <th:block layout:fragment="script">
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+
+      function confirmModal(form){
+    	  var t=document.getElementById('title').value;
+    	  var c=document.getElementById('content').value;
+    	  if(t=="" || c==""){alert('제목 또는 내용이 비어있습니다'); return false;}
+    	  var confirm = window.confirm('제출하시겠습니까?');
+    	  if(confirm){return true;}
+  		    else { return false;}
+  		  }
+        
+      /*]]>*/
+    </script>
+  </th:block>
+  
+</html>
+

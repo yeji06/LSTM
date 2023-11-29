@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.board.mapper.BoardMapper">
+  	
+	<sql id="boardColumns">
+		  idx
+		, nickname
+		, title
+		, content
+		, reg_date
+		, view_cnt
+		, delete_yn
+		, up_date
+		</sql>
+
+<!-- 웹 -->
+	<select id="selectBoardList2" parameterType="BoardDTO" resultType="BoardDTO">
+	   SELECT (select count(*) 
+				from COMMENTS 
+				where b.idx = board_idx 
+				and delete_yn='n') COMMENTS 
+		  ,	idx
+		  , title
+		  , nickname
+		  , reg_date reg_date2
+		  , view_cnt
+		 FROM BOARD b
+		 WHERE delete_yn = 'n'
+		<include refid="CommonMapper.search_board_o" />
+		ORDER BY idx desc
+		 <include refid="CommonMapper.paging" />
+		</select>	
+	<select id="selectBoardTotalCount2" parameterType="BoardDTO" resultType="int">
+	    SELECT
+	      COUNT(*)
+	    FROM
+	      BOARD
+	    WHERE delete_yn = 'n'
+    	<include refid="CommonMapper.search_board_o" />
+	 	</select>
+	 	
+	<select id="selectBoardDetail2" parameterType="Long" resultType="BoardDTO">
+		SELECT
+		<include refid="boardColumns"/> , reg_date reg_date2
+		FROM BOARD WHERE delete_yn = 'N' AND idx = #{idx}
+		</select>	
+	
+<!-- 안드로이드 -->
+ 	<select id="selectBoardList" parameterType="AndroidBoardDTO" resultType="AndroidBoardDTO">
+	   SELECT
+			idx
+		  , title
+		  , nickname
+		  , reg_date
+		  , view_cnt
+  		  , content
+		 FROM BOARD
+		 WHERE delete_yn = 'n'
+		ORDER BY idx DESC
+		</select>
+	<select id="selectBoardTotalCount" parameterType="AndroidBoardDTO" resultType="int">
+	    SELECT
+	      COUNT(*)
+	    FROM
+	      BOARD
+	    WHERE delete_yn = 'n'
+   		</select>
+
+	<select id="selectBoardDetail" parameterType="Long" resultType="AndroidBoardDTO">
+		SELECT
+		<include refid="boardColumns"/>
+		FROM BOARD WHERE delete_yn = 'N' AND idx = #{idx}
+		</select>	
+		
+	<insert id="insertBoard" parameterType="AndroidBoardDTO">
+		INSERT INTO BOARD (
+		<include refid="boardColumns" />
+		) VALUES (
+			    null
+			  ,	#{nickname} 
+			  ,	#{title} 
+			  ,	#{content} 
+		      , now()
+			  ,	0
+			  , 'n'
+			  ,	null 
+			  
+			  )
+		</insert>
+	
+	<update id="updateBoard" parameterType="AndroidBoardDTO"> 
+		UPDATE BOARD 
+		SET 
+			up_date = now()
+		  , title = #{title} 
+		  , content = #{content} 
+		WHERE idx = #{idx} 
+		</update>
+	
+	<update id="deleteBoard" parameterType="long">
+		UPDATE BOARD 
+		SET delete_yn = 'Y' 
+		  , up_date = now()
+		WHERE idx = #{idx}
+		</update>
+	
+	<update id="view" parameterType="long">
+		UPDATE BOARD 
+		SET view_cnt = (view_cnt+1)
+		WHERE idx = #{idx}
+		</update>
+	
+</mapper>

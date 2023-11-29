@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.board.mapper.WorkMapper">
+  	
+  <select id="getWorkInfoByDate" parameterType="com.board.domain.AndroidWorkDTO" resultType="com.board.domain.AndroidWorkDTO">
+    SELECT work_on, work_off
+    FROM WORK
+    WHERE LEFT(work_On, 10) = #{workOn} AND no = #{no}; 
+    </select>
+    
+	<insert id="insertWork" parameterType="WorkDTO">
+		INSERT INTO WORK (no, work_on, work_off)
+		VALUES ((SELECT NO 
+			       FROM EMPLOYEE e
+			      WHERE e.name = #{name} 
+			        AND e.jumin_num = #{jumin})
+		      , now()
+		      , null)
+	</insert>
+<!-- 퇴근입력 -->
+	<update id="updateWork" parameterType="WorkDTO">
+		update WORK
+		   SET work_off = now()  
+		 where no = (select no from EMPLOYEE e 
+		 			  WHERE e.name = #{name} 
+			          AND e.jumin_num = #{jumin})
+		   and work_on in ( select work_on from(SELECT max(work_on) as work_on 
+							from WORK 
+							WHERE NO = (SELECT NO 
+			  		 		 			  FROM EMPLOYEE e
+			        					  WHERE e.name = #{name} 
+			        						AND e.jumin_num = #{jumin}) ) as wt) 
+	</update>
+<!-- 존재하는 직원 확인 -->
+	<select id="selectEmp" resultType="WorkDTO">
+	SELECT NO 
+    FROM EMPLOYEE e
+	WHERE e.name = #{name} 
+    AND e.jumin_num = #{jumin}	        		  			    
+	</select>
+<!-- 퇴근하는 직원 확인 -->
+	<select id="selectWork" resultType="WorkDTO">
+	 select *
+	 from WORK 
+	 where no = (select no from EMPLOYEE e where e.name = #{name} and e.jumin_num = #{jumin}) 
+	 and   work_on in ( SELECT max(work_on) 
+			      		 FROM WORK
+			     		WHERE NO = (SELECT NO 
+		  		 		 			   FROM EMPLOYEE e
+		        					 WHERE e.name = #{name} and e.jumin_num = #{jumin}))       		  			    
+	</select>
+
+  <select id="selectWorkList2" parameterType="WorkDTO" resultType="WorkDTO">
+		SELECT
+		    ROW_NUMBER() OVER (ORDER BY work_on, e.no) num,
+			e.NO no,
+			name name,
+			work_on work_date,
+			work_on,
+			work_off,
+			SEC_TO_TIME(TIMESTAMPDIFF(second, date_format(work_on, '%Y-%m-%d %H:%i:%s'), date_format(work_off, '%Y-%m-%d %H:%i:%s'))) AS worktime
+		 FROM EMPLOYEE e , WORK w
+		WHERE e.NO = w.no
+		AND e.no = #{no}
+		<include refid="CommonMapper.search_o" />
+		ORDER BY num desc
+		 <include refid="CommonMapper.paging" />
+		</select>
+
+	<select id="selectWorkList" parameterType="WorkDTO" resultType="WorkDTO">
+		SELECT
+		    ROW_NUMBER() OVER (ORDER BY work_on, e.no) num,
+			e.NO no,
+			name name,
+			work_on work_date,
+			work_on,
+			work_off,
+			SEC_TO_TIME(TIMESTAMPDIFF(second, date_format(work_on, '%Y-%m-%d %H:%i:%s'), date_format(work_off, '%Y-%m-%d %H:%i:%s'))) AS worktime
+		 FROM EMPLOYEE e , WORK w
+		WHERE e.NO = w.no
+		<include refid="CommonMapper.search_o" />
+		ORDER BY num desc
+		 <include refid="CommonMapper.paging" />
+		</select>
+
+ <select id="selectWorkTotalCount" parameterType="WorkDTO" resultType="int">
+    SELECT
+      COUNT(*)
+    FROM
+      WORK w, EMPLOYEE e
+    WHERE w.no = e.no
+    <include refid="CommonMapper.search_o" />
+  </select>
+
+ <select id="selectWorkTotalCount2" parameterType="WorkDTO" resultType="int">
+    SELECT
+      COUNT(*)
+    FROM
+      WORK w, EMPLOYEE e
+    WHERE w.no = e.no
+    AND e.no = #{no}
+    <include refid="CommonMapper.search_o" />
+  </select>
+</mapper>

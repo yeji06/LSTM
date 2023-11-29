@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="project/layout/basic">
+<th:block layout:fragment="content">
+
+	<div class="box2">
+	<div class="box2-inbox">
+		<h2>Login</h2>
+	<div class="login-wrapper">
+	
+		<div class="login">
+		<form method="post" th:action="@{/user/login}"  th:object="${user}" onsubmit="return login(this)">
+				<input id="nickname" type="text" th:field="*{nickname}" placeholder="nickname" required/>
+			<input type="password" th:field="*{pw}" placeholder="password" required/>
+			<input type="submit" value="Login"/>
+		</form>
+		</div>
+		<div style="text-align:left;">
+		<a style="color:red; font-size:10px; font-family:arial;" onclick="lost()">패스워드 찾기</a>
+		</div>
+	</div><!-- login-wrapper -->
+	</div><!-- box2_inbox -->
+	</div><!-- box2 -->
+</th:block>
+<th:block layout:fragment="script">
+ <script th:inline="javascript">
+  /*<![CDATA[*/
+	document.getElementById('nickname').focus();
+    function lost(){ //패스워드찾기
+    	var url = "/user/lost"
+        	var name = "닉네임 찾기 및 패스워드 변경"
+        	var option="width=700,height=300,location=no"
+            window.open(url,name,option);
+    }
+	  
+    var err = [[${errorMessage}]];
+    var success = [[${successMessage}]];
+  	function message(){
+  		if (err != null)
+ 		 alert( err );
+  		if (success != null)
+	     alert( success );
+	}
+	message();
+	
+  /*]]>*/
+ </script>
+</th:block>
+
+</html>
+
+

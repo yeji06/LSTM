@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="project/layout/basic">
+<th:block layout:fragment="content">
+
+	<div class="box2">
+		<div class="box-title">Sign up</div>
+	<div class="box2-inbox">
+		<div class="signUp">
+		<form method="post" th:action="@{/user/signUp}" th:object="${user}" onsubmit="return validateForm()">
+			<input type="text" 	   th:field="*{employeeNo}" placeholder="employee number"/>
+			<input type="text"	   th:field="*{nickname}"   placeholder="new nickname"/>
+			<input type="password" th:field="*{pw}"  		placeholder="new password" />
+			<input type="password" th:field="*{pw2}" 		placeholder="confirm password"/>
+			<fieldset>
+				<legend>확인</legend>
+				<label>
+					<input type="checkbox" name="agreeProv" value="y">
+					닉네임은 고유한 id 이므로 변경할 수 없으니 신중하게 결정하여 주시길바랍니다.</label>
+			</fieldset>
+			<input type="submit" value="Sign up" />
+		</form>
+		</div>
+		
+	</div><!-- box2_inbox -->
+	</div><!-- box2 -->
+</th:block>
+<th:block layout:fragment="script">
+ <script th:inline="javascript">
+  /*<![CDATA[*/
+     function validateForm() {
+    var employeeNo = document.querySelector('input[name="employeeNo"]').value;
+    var nickname = document.querySelector('input[name="nickname"]').value;
+    var pw = document.querySelector('input[name="pw"]').value;
+    var pw2 = document.querySelector('input[name="pw2"]').value;
+    
+    if (employeeNo === '' || nickname === '' || pw === '' || pw2 === '') {
+      alert('모든 정보를 입력해주세요.');
+      return false; // 폼 제출을 막음
+    }
+    if (pw !== pw2) {
+        alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+        return false;
+    }
+
+    return true; // 폼이 제대로 작동할 경우 true를 반환하여 제출을 허용
+  }
+  
+  	function message(){
+  		if (err != null)
+ 		 alert( err );
+  		if (signup != null)
+	     alert( success );
+	}
+	message();
+	
+  /*]]>*/
+ </script>
+</th:block>
+
+</html>
